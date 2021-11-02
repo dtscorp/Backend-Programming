@@ -50,7 +50,7 @@ class student_Controller extends Controller
                 "jurusan" => $jurusan
             ]
         );
-        $student = Student::find($id)->get();
+        $student = Student::where('id',$id)->get();
         $data = [
             "message" => "data student is Updated",
             "data" => $student,
