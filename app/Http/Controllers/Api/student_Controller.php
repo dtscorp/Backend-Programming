@@ -14,6 +14,21 @@ class student_Controller extends Controller
         $student = Student::all();
         return response()->json($student);
     }
+    public function show($id)
+    {
+        $student = Student::find($id);
+
+        if ($student == null) {
+            $error_message = [
+                "message" => "data not found"
+            ];
+            return response()->json($error_message, 404);
+        }
+        return response()->json($student, 200);
+
+        $nama = $student->nama;
+        echo "hallo, $nama";
+    }
     public function create(Request $request)
     {
         $nama = $request->nama;
@@ -42,27 +57,44 @@ class student_Controller extends Controller
         $email = $request->email;
         $jurusan = $request->jurusan;
 
-        Student::find($id)->update(
-            [
-                "nim" => $nim,
-                "nama" => $nama,
-                "email" => $email,
-                "jurusan" => $jurusan
-            ]
-        );
-        $student = Student::where('id',$id)->get();
-        $data = [
-            "message" => "data student is Updated",
-            "data" => $student,
-        ];
-        return response()->json($data, 201);
+        $student = Student::find($id);
+        if ($student) {
+            $student->update(
+                [
+                    'nama' => ($nama ? $nama : $student->nama),
+                    'nim' => ($nim ? $nim : $student->nim),
+                    'email' => ($email ? $email : $student->email),
+                    'jurusan' => ($jurusan ? $jurusan : $student->jurusan)
+                ]
+            );
+            $student = Student::where('id', $id)->get();
+            $data = [
+                "message" => "data student is Updated",
+                "data" => $student,
+            ];
+            return response()->json($data, 200);
+        } else
+            $data = [
+                "message" => "data not found",
+            ];
+        return response()->json($data, 404);
     }
+
+
     public function destroy($id)
     {
-        Student::find($id)->delete();
-        $data = [
-            "message" => "data Student is delete",
-        ];
-        return response()->json($data);
+        $student =  Student::find($id);
+        if ($student) {
+            $student->delete();
+            $data = [
+                "message" => "data Student is delete",
+            ];
+            return response()->json($data, 200);
+        } else {
+            $data = [
+                "message" => "data not found",
+            ];
+            return response()->json($data, 404);
+        }
     }
 }
